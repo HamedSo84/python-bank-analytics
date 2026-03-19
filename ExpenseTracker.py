@@ -1,5 +1,5 @@
 import os
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import json
 FILE_NAME = "money.json"
 
@@ -34,67 +34,64 @@ def save_transactions(amount, balance, transaction_type):
     with open(FILE_NAME, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=4)
 
-def add_transaction():
-    while True:
-        global Account_balance
-        Value = input("Would you like to withdraw or deposit or back? w/d/b: ")
-        if Value == "d":
-            deposit = float(input("Enter the deposit amount: "))
-            Account_balance += deposit
-            balance = deposit
-            transaction = "deposit"
-            save_transactions(balance, Account_balance, transaction)
+def add_transaction(transaction, amount):
+    global Account_balance
+    if transaction == "deposit":           
+        Account_balance += amount
+        save_transactions(amount, Account_balance, transaction)
+        return "Deposit successful"
 
-        elif Value == "w":
-            withdraw = float(input("Enter the withdraw amount:"))
-            Account_balance -= withdraw
-            balance = withdraw
-            transaction = "withdraw"
-            save_transactions(balance, Account_balance, transaction)
+    elif transaction == "withdraw":
+        if amount > Account_balance:
+            return "Error: Insufficient funds!"
 
-        elif Value == "b":
-            break
-            
-        else:
-            print("Invalid command")
+        Account_balance -= amount
+        save_transactions(amount, Account_balance, transaction)
+        return "Withdraw successful"
+
+    else:
+        return "Invalid command"
 
 def show_charts():
     if not os.path.exists(FILE_NAME):
-        print("No transactions found! Please add some first")
-        return
+        return "No transactions found! Please add some first"
 
     with open(FILE_NAME, "r", encoding="utf-8") as file:
         try:
             data = json.load(file)
         except json.JSONDecodeError:
-            print("File is empty or corrupted")
-            return
-    deposits = []
-    withdrawals = []
+            return "File is empty or corrupted"
+
+    deposits = [0]
+    withdrawals = [0]
 
     for item in data:
-        print(item)
         if item["type"] == "deposit":
             deposits.append(item["amount"])
         elif item["type"] == "withdraw":
             withdrawals.append(item["amount"])
 
-    print(deposits)
+    x_depo = range(len(deposits))
+    x_with = range(len(withdrawals))
 
+    plt.plot(x_depo, deposits, label="Deposits", color="green", marker="o")
+    plt.plot(x_with, withdrawals, label="Withdrawals", color="red", marker="o")
+    plt.title("Financial Report")
+    plt.xlabel("Number of Transactions")
+    plt.ylabel("Transaction Amount")
+    plt.grid(True)
+    plt.legend()
+    plt.show()
 
-
-def menu():
-    while True:
-        value = input("add_transaction or Check Balance or show_transactions or exit? a/ch/sh/e: ").lower()
-        if value == "a":
-            add_transaction()
-        elif value == "ch":
-            print(Account_balance)
-        elif value == "sh":
-            show_charts()
-        elif value == "e":
-            break
-        else:
-            print("Invalid command")
-
-menu()
+if __name__ == "__main__":
+    
+    testValiddeposit= add_transaction("deposit", 1500)
+    print(testValiddeposit)
+    
+    testValidwithdraw = add_transaction("withdraw", 500)
+    print(testValidwithdraw)
+    
+    testInvalidwithdraw = add_transaction("withdraw", 50000)
+    print(testInvalidwithdraw)
+    
+    show_charts()
