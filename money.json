@@ -1,0 +1,37 @@
+[
+    {
+        "type": "deposit",
+        "amount": 50.0,
+        "balance": 50.0
+    },
+    {
+        "type": "deposit",
+        "amount": 50.0,
+        "balance": 50.0
+    },
+    {
+        "type": "deposit",
+        "amount": 100.0,
+        "balance": 150.0
+    },
+    {
+        "type": "withdraw",
+        "amount": 50.0,
+        "balance": 100.0
+    },
+    {
+        "type": "deposit",
+        "amount": 500.0,
+        "balance": 500.0
+    },
+    {
+        "type": "withdraw",
+        "amount": 400.0,
+        "balance": 100.0
+    },
+    {
+        "type": "withdraw",
+        "amount": 20.0,
+        "balance": -20.0
+    }
+]
