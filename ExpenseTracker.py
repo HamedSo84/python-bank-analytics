@@ -2,13 +2,18 @@ import os
 import matplotlib.pyplot as plt
 import json
 import datetime
+from enum import Enum
+
+class Transactiontype(Enum):
+    DEPOSIT = "deposit"
+    WITHDRAW = "withdraw"
 
 class Transaction:
     def __init__(self, t_type, amount, balance):
         self.type = t_type
         self.amount = amount
         self.balance = balance
-        self.time = datetime.now().strftime("%Y-%m-%d")
+        self.time = datetime.datetime.now().strftime("%Y-%m-%d")
 
     def to_dict(self):
         return {
@@ -44,19 +49,19 @@ class BankAccount:
 
             except (json.JSONDecodeError, FileNotFoundError):
                 data = []
-
-        data.append(Transaction.to_dict())
+        t = Transaction(transaction_type, amount, self.balance)
+        data.append(t.to_dict())
 
         with open(self.file_name, "w", encoding="utf-8") as file:
             json.dump(data, file, indent=4)
 
-    def add_transaction(self, transaction, amount):
-        if transaction == "deposit":           
+    def add_transaction(self, transaction: Transactiontype, amount):
+        if transaction == Transactiontype.DEPOSIT:           
             self.balance += amount
             self.save_transactions(amount, transaction)
             return "Deposit successful"
 
-        elif transaction == "withdraw":
+        elif transaction == Transactiontype.WITHDRAW:
             if amount > self.balance:
                 return "Error: Insufficient funds!"
 
@@ -77,14 +82,13 @@ class BankAccount:
             except json.JSONDecodeError:
                 return "File is empty or corrupted"
 
-        deposits = [0]
-        withdrawals = [0]
-        balance = [0]
-        dayes = []
+        deposits = []
+        withdrawals = []
+        balance = []
+        days = []
 
         for item in data:
-            day = item["time"].split("-")[2]
-            dayes.append(int(day))
+            days.append(int(item["time"].split("-")[2]))
             balance.append(item["balance"])
             if item["type"] == "deposit":
                 deposits.append(item["amount"])
@@ -104,9 +108,9 @@ class BankAccount:
         plt.legend()
 
         plt.figure(2)
-        plt.plot(dayes, balance, label="Account_balance", color="blue", marker="o")
+        plt.plot(days, balance, label="Account_balance", color="blue", marker="o")
         plt.title(f"Account Balance History - {self.name}")
-        plt.xlabel("Number of Transactions")
+        plt.xlabel("Day of Month")
         plt.ylabel("Transaction Amount")
         plt.grid(True)
         plt.legend()
@@ -135,4 +139,4 @@ if __name__ == "__main__":
     print(my_wallet.add_transaction("withdraw", 500))
     print(my_wallet.add_transaction("withdraw", 50000))
     print(my_wallet.balance)
-    #my_wallet.show_charts()
+    my_wallet.show_charts()
