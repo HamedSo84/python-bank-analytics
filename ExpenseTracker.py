@@ -7,6 +7,13 @@ from enum import Enum
 import uuid
 from typing import List
 from dataclasses import dataclass, asdict, field
+import logging
+
+
+logging.basicConfig(
+    filename="bank.log",
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s")
 
 class Transactiontype(Enum):
     DEPOSIT = "deposit"
@@ -77,6 +84,7 @@ class BankAccount:
         )
         self.transactions.append(t)
         self.save_transactions()
+        logging.info(f"Deposit | amount={amount} | balance={self._balance}")
         return t
 
     def withdraw(self, amount: float):
@@ -94,6 +102,7 @@ class BankAccount:
         )
         self.transactions.append(t)
         self.save_transactions()
+        logging.info(f"Withdraw | amount={amount} | balance={self._balance}")
         return t
 
 class AccountAnalytics:
@@ -102,8 +111,7 @@ class AccountAnalytics:
 
     def show_charts(self):
         if not self.transactions:
-            print("No transactions to show.")
-            return
+            return "No transactions to show."
 
         days = [t.timestamp for t in self.transactions]
         deposits = [t.amount if t.type == Transactiontype.DEPOSIT.value else 0 for t in self.transactions]
